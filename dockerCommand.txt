@@ -1,0 +1,26 @@
+拉去镜像：docker pull 镜像名
+查看镜像 docker images
+
+#以nginx为例 -p 端口映射
+运行镜像 docker run -d --name 别名 -p 80:80 镜像名  
+
+查看运行中的容器: docker ps 查看所有容器:docker ps -a
+
+自制镜像
+docker commit -m "message" 镜像名（mynginx） 自制的镜像名（mynginx:v1）
+
+保存镜像:docker save -o mynginx.tar mynginx:v1
+
+加载镜像: docker load -i mynginx.tar
+
+推送自制镜像到自己的dockerhub
+
+登录自己的dockerhub：docker login
+
+镜像重命名
+需要放在以自己的dockerhub账户名命名的文件夹下 比如：zhf19880504
+docker tag mynginx:v1 zhf19880504/mynginx:v1
+推送到自己的dockerhub：
+
+
+ 
