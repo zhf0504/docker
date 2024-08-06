@@ -23,4 +23,66 @@ docker tag mynginx:v1 zhf19880504/mynginx:v1
 推送到自己的dockerhub：
 
 
- 
+ 挂载目录 运行docker时 将app/mghml目录挂载docker上，就能操作/usr/share/nginx/html目录下的html文件
+docker run -d -p 80:80 -v /app/nghml:/usr/share/nginx/html --name app01 nginx
+docker ps
+cd /app/ 切换到根目录下的app文件
+[root@localhost app]# echo 22222222 > index.html  将2222222写入到 index.html
+
+卷映射
+docker run -d -p 88:80 -v ngconfig:/etc/nginx --name app02 nginx
+config文件将会保存在系统的 
+/var/lib/docker/volumes/ 下
+  所有的卷都会存在着
+切到 cd /var/lib/docker/volumes/
+ cd ngconfig
+ cd _data
+[root@localhost _data]# vi nginx.conf    在容器外部修改文件内容:添加注释#hahaha 
+[root@localhost _data]# docker exec -it app02 bash 进入容器内部
+root@f461cc1b5132:/# cd /etc/nginx/   查看/etc/nginx/ 目录下的nginx.conf是否被修改
+root@f461cc1b5132:/etc/nginx# cat nginx.conf 
+#hahaha 确实被修改了
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+
+查看卷的位置
+[root@localhost _data]# docker volume ls 查看卷
+
+[root@localhost _data]# docker volume inspect ngconfig 用这个指令就可以看到卷的路径
+[
+    {
+        "CreatedAt": "2024-08-06T22:34:10+08:00",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/ngconfig/_data", 就是这个路径
+        "Name": "ngconfig",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+
+
+
+
+
+
