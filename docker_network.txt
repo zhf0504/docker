@@ -1,0 +1,55 @@
+使用暴露在容器外的端口让让两个容器互相通信
+
+创建两个端口不一样的容器
+docker run -d -p 88:80 --name app1
+docker run -d -p 99:80 --name app2
+
+查看创建的容器 docker ps
+777f0dcbbd7f   nginx     "/docker-entrypoint.…"   9 minutes ago   Up 9 minutes   0.0.0.0:99->80/tcp, :::99->80/tcp   app2
+60fdcdfdb417   nginx     "/docker-entrypoint.…"   9 minutes ago   Up 9 minutes   0.0.0.0:88->80/tcp, :::88->80/tcp   app1
+
+进入一个容器
+docker exec -it app1 bash
+使用虚拟机的网络访问app2
+curl 192.168.91.139:99
+这种比较绕
+
+第二种方法
+每个容器都有自己的网络
+查看容器网络 例如app1
+docker container inspect app1
+
+ "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:11:00:02",
+                    "NetworkID": "ca33dec824b16180e4813c8422616fa5a43c0a36c5758cea30d668d7f49d15e6",
+                    "EndpointID": "ca72ac2d5c7e695245e11658b51368c803ae606ccadf77db9bb55cf2c74ef78f",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2", 这个就是app1网络
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DriverOpts": null,
+                    "DNSNames": null
+                }
+            }
+
+进入app2容器 来访问app1
+docker exec -it app2 bash
+curl 172.17.0.2:80 此时用的是容器内部的端口，不是映射的外部端口
+
+
+3.使用域名访问，自定义网络
+创建自定义网络: docker network create mynet
+查看自定义网络：docker network inspect
+使用自定义网络启动两个容器
+docker run -d -p 88:80 --name app1 --network mynet nginx
+docker run -d -p 99:80 --name app2 --network mynet nginx
+进入app1容器 docker exec -it app1 bash
+app1访问app2: curl http://app2:80 使用自己容器名作为域名
+
+
