@@ -1,0 +1,34 @@
+自己制作镜像
+
+常用制作镜像指令
+FROM 指定镜像基础环境
+RUN 运行自定义命令
+CMD 容器启动命令或参数
+LABEL 自定义标签
+EXPOSE 指定暴露端口
+ENV 环境变量
+ADD 添加文件到镜像
+COPY 复制文件到镜像
+ENTRYPOINT 容器固定启动命令
+VOLUME 数据卷
+USER 指定用户和用户组
+WORKDIR 指定默认工作目录
+ARG 指定构建参数
+
+制作镜像
+FROM openjdk:17   --基础环境
+
+LABAL author=zhf --打标签
+
+copy app.jar /app.jar --把jar复制到镜像里面
+
+EXPOSE 8080 暴露端口
+
+ENTRYPOINT ["java","-jar","/app.jar"] 启动jar包
+
+构建镜像 -t 为镜像起tag .表示当前目录
+docker build -f Dockerfile -t myjavaapp'v1.0 .
+
+用制作的镜像启动容器
+docker run -d -p 8888:8080 myjavaapp:v1.0
+

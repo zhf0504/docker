@@ -28,14 +28,19 @@ docker run -d -p 6380:6379 \
 
 
 wordpress
+
+docker network create blog
+
+
 docker run -d -p 3306:3306 \
- -v /app/myconf:/etc/mysql/conf.d \
-  -v /app/mydata:/var/lib/mysql \
   -e MYSQL_ROOT_PASSWORD=123456 \
   -e MYSQL_DATABASE=wordpress \
+  -v /app/myconf:/etc/mysql/conf.d \
+  -v mysql-data:/var/lib/mysql \
   --restart always --name mysql \
   --network blog \
   mysql:8.0
+ 
 
 运行wordpress容器并配置
 docker run -d -p 8080:80 \

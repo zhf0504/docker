@@ -1,0 +1,49 @@
+使用compose.yml一键启动wordpress，内容如下
+
+name: myblog
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQl_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=wordpress
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - /app/myconf:/etc/mysql/conf.d
+    restart: always
+    networks:
+      - blog
+  
+  wordpress:
+    image: wordpress
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: 123456
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress:/var/www/html
+    restart: always
+    networks:
+      - blog
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:
+  wordpress:
+
+networks:
+  blog:
+
+启动compose.yml文件 -f指定要启动的文件名，默认是compose.yml  -d后台启动
+docker compose -f compose.yml up -d
+下线
+docker compose -f compose.yml down
+下线并删除所有镜像和卷
+docker compose -f compose.yml down --rmi all -v
